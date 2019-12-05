@@ -1,30 +1,33 @@
-﻿using System;
-using SpaceRental.Core.Entities;
+﻿using SpaceRental.Core.Entities;
 using SpaceRental.Core.Gateways;
 
 namespace SpaceRental.Core.UseCases
 {
     public interface IRegisterUserInteractor
         : IUseCaseInteractor<RegisterUserRequest, RegisterUserResponse>
-    {}
+    { }
 
     public class RegisterUserInteractor : IRegisterUserInteractor
     {
-        private IAuthGateway _authGateway; 
-        public RegisterUserInteractor(IAuthGateway auth)
+        private IRepositoryGateway<User> _users;
+        private IAuthGateway _auth;
+        public RegisterUserInteractor(
+            IRepositoryGateway<User> userRepository,
+            IAuthGateway auth)
         {
-            _authGateway = auth;
+            _users = userRepository;
+            _auth = auth;
         }
 
         public RegisterUserResponse Handle(RegisterUserRequest request)
         {
-            // Build user object to send to auth gateway.
+            // Save the new user
             var user = new User();
-            _authGateway.CreateUser(user);
+            _users.Create(user);
 
             // return the JWT so they can continue in the app
-
-            throw new NotImplementedException();
+            var jwt = _auth.Login(user.Email, user.Password);
+            return new RegisterUserResponse() { jwt = jwt };
         }
     }
 }
