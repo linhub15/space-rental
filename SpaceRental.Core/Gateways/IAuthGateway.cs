@@ -5,6 +5,6 @@ namespace SpaceRental.Core.Gateways
 {
     public interface IAuthGateway
     {
-        Guid CreateUser(User user);
+        string Login(string email, string password);
     }
 }
